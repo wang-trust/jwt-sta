@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jwt test</title>
+    <style>
+        .w-btn {
+            border-radius: 4px;
+            background-color: #FFA07A;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: pointer;
+            text-align: center;
+            box-sizing: border-box;
+            width: 50px;
+        }
+        #showinfo{
+            color: #f00;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="">
+        <label>用户名：<input type="text" id="username" value="goupi"></label> <br>
+        <label>密码：<input type="password" id="password" value="123456"></label>
+        <div id="showinfo">调试信息</div>
+        <div id="login-btn" class="w-btn">登录</div>
+    </form>
+
+    <script>
+        window.onload = function () {
+            setonclick();
+        }
+        function setonclick() {
+            document.querySelector('#login-btn').onclick = loginBtn;
+
+        }
+        function loginBtn() {
+            let v1, v2, v3, v4, v5, v6;
+
+            v1 = document.querySelector('#username').value;
+            v2 = document.querySelector('#password').value;
+            v3 = document.querySelector('#showinfo');
+            if (v1 === '' || v2 === '') {
+                v3.innerText = '用户名和密码不能为空！';
+                return;
+            }
+            v5 = {};
+            v5['username'] = v1;
+            v5['password'] = v2;
+            v5 = JSON.stringify(v5);
+
+            console.log(v5);
+            console.log(typeof v5);
+            return ;
+
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = 'json';
+            xhr.open('POST', '/login');
+            xhr.send(JSON.stringify());
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    console.log('login succeed');
+                }
+            };
+        }
+
+    </script>
+</body>
+
+</html>
