@@ -1,11 +1,19 @@
 import express from "express";
-
+import { UserModel } from "./db_middle.js";
+import { FormatDate } from "./format.js";
 
 const app = new express();
+// 获取请求体
+app.use(express.urlencoded({extended: false}))
 
-app.get('/login', (req, res) => {
-    res.end('hello express');
+app.get('/login', async (req, res) => {
+    let v1 = await UserModel.modelFind('goupi2', '123456');
+    
+    v1.signupDate = FormatDate(v1.signupDate);
+    res.send(v1);
 });
+
+
 
 
 
