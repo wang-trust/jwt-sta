@@ -30,7 +30,8 @@ const BookSchma = new mongoose.Schema({
                     isDelete: 0,
                     __v: 0
                 });
-                return res.toJSON();
+                
+                return res !== null ? res.toJSON() : null;
             },
             async modelInsert(userObj){
                 if(userObj === null || userObj.username === null || userObj.password === null){
