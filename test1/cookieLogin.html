@@ -1,0 +1,63 @@
+<!--
+ * @Author: army liu
+ * @Date: 2020-11-22 13:47:37
+ * @LastEditors: army liu
+ * @LastEditTime: 2020-11-22 16:01:18
+ * @FilePath: \font\cookieLogin.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./js/jquery-1.11.0.min.js"></script>
+</head>
+
+<body>
+    <div>
+        用户名: <input type="text" id="name"><br>
+        密 码：<input type="password" id="password"><br>
+        <button id="btn">提交</button>
+    </div>
+    <script>
+        window.onload = () => {
+            function fidCookie(name){
+                let cookieArr = document.cookie.split("; ");
+                let Obj = {}
+                for(let val of cookieArr){
+                    let temp = val.split("=");
+                    Obj[temp[0]] = temp[1];
+                }
+                return Obj[name];
+            }
+            if(fidCookie("username")){
+                window.location.href = '/cookieIndex.html'
+            }
+            $('#btn').on('click', function () {
+                let name = $('#name').val();
+                let pwd = $('#password').val();
+                console.log(name, pwd)
+                $.ajax({
+                    type: "post",
+                    url: "http://127.0.0.1:3000/login",
+                    data: {
+                        name,
+                        pwd
+                    },
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    crossDomain: true,
+                    success: function (response) {
+                        console.log(response)
+                        window.location.href = '/cookieIndex.html'
+                    }
+                });
+            })
+        }
+    </script>
+</body>
+
+</html>

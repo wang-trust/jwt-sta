@@ -3,11 +3,12 @@ window.onload = function () {
 }
 
 var testDic = {
-    urlhead: 'http://192.168.0.117:9613'
+    urlhead: 'https://v4server.wangtrust.top:9611/api'
 }
 
 function setonclick() {
     document.querySelector('#login-btn').onclick = loginBtn;
+    document.querySelector('#login-test').onclick = loginTest;
 
 }
 function loginBtn() {
@@ -25,20 +26,33 @@ function loginBtn() {
     v5['password'] = v2;
     v5 = JSON.stringify(v5);
 
-    // console.log(typeof v5);
-    // return ;
-    
-    
-    // v5 = `username=${v5['username']}&password=${v5['username']}`;
-    console.log(v5);
-
-
-
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.open('POST', testDic.urlhead + '/login');
     xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.withCredentials = true;
     xhr.send(v5);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            console.log('login succeed');
+        }
+    };
+}
+
+
+function loginTest() {
+    let v1, v2, v3, v4, v5, v6;
+
+    v1 = { a: 1};
+    console.log('test-btn ok');
+
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.open('POST', testDic.urlhead + '/test');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.withCredentials = true;
+    
+    xhr.send(JSON.stringify(v1));
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             console.log('login succeed');

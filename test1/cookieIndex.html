@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./js/jquery-1.11.0.min.js"></script>
+</head>
+
+<body>
+    <h1>我是cookie页面</h1>
+    <script>
+        function fidCookie(name) {
+            let cookieArr = document.cookie.split("; ");
+            let Obj = {}
+            for (let val of cookieArr) {
+                let temp = val.split("=");
+                Obj[temp[0]] = temp[1];
+            }
+            console.log(Obj)
+            return Obj[name];
+        }
+        let h1 = document.createElement('h1');
+        h1.innerHTML = "你好," + fidCookie("username")
+        document.body.appendChild(h1)
+    </script>
+</body>
+
+</html>
