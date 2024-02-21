@@ -75,7 +75,9 @@ const UserLoginLogModel = new mongoose.Schema({
       default: Date.now
     },
     platform: String,
-    isDone: Number,
+    token: String,
+    ipaddress: String,
+    // isDone: Number, // 含义不明
     isDelete: Number
 })
 ```
@@ -85,15 +87,18 @@ const UserLoginLogModel = new mongoose.Schema({
 ```js
 // 仅记录refresh-token，准备存储到Redis中
 const LoginingModel = new mongoose.Schema({
-  uid: Number,
+    uid: Number,
     username: String,
     token: String,
     platform: String,
-    loginTime: {
+    iatTime: {
       type: Date,
       default: Date.now
     },
-    duration: Number
+    expTime: {
+      type: Date,
+      default: Date.now
+    },
 })
 ```
 
@@ -101,15 +106,19 @@ const LoginingModel = new mongoose.Schema({
 
 ```js
 // 仅记录refresh-token，准备存储到Redis中
-const discardTokenModel = new mongoose.Schema({
+const LoginingModel = new mongoose.Schema({
     uid: Number,
     username: String,
     token: String,
-    loginTime: {
+    platform: String,
+    iatTime: {
       type: Date,
       default: Date.now
     },
-    duration: Number
+    expTime: {
+      type: Date,
+      default: Date.now
+    },
 })
 ```
 

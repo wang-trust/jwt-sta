@@ -2,12 +2,13 @@ import express from "express";
 import bodyParser from "body-parser";
 import jwt from "jsonwebtoken";
 import cookParser from "cookie-parser";
+
 import { FormatDate } from "./format.js";
-import { UserModel } from "./db_middle.js";
+import { UserModel, UserLoginLogModel } from "./db_middle.js";
 import { crossDomainMiddleware, testMiddleWare } from "./middleWare/crossDomain.js";
 import { ResponseMsg } from "./config/struct.js";
-
 import { jwtInfo } from "./config/config.js";
+
 
 const app = new express();
 
@@ -53,10 +54,12 @@ app.post('/api/login', async (req, res) => {
 
     let token = jwt.sign(
         {
+            uid: v1.uid,
             username: v1.username,
             role: v1.role,
-            issuer: jwtInfo.secret,
-            audience: jwtInfo.audience
+            issuer: jwtInfo.issuer,
+            audience: jwtInfo.audience,
+            platform: null
         },
         jwtInfo.secret,
         {
@@ -65,17 +68,30 @@ app.post('/api/login', async (req, res) => {
     );
 
     console.log(token);
-
     // res.header("Access-Control-Allow-Credentials", "true");
+
     res.cookie('wangtrust_uid', token, {
-        maxAge: 60*60*24*1000,
+        maxAge: 60 * 60 * 24 * 1000,
         sameSite: 'none',
-		secure: 'auto',
+        secure: 'auto',
         httpOnly: true
         // domain: 'wangtrust.top:9611'
     });
 
-        // res.cookie('wangtrust_uid', token);
+    let userrecord = new UserLoginLogModel({
+        uid: v1.uid,
+        username: v1.username,
+        refer: req.headers.referer,
+        platform: null,
+        token: token,
+        ipaddress: req.get('x-real-ip')
+    });
+    await userrecord.save();
+
+    // console.log(userrecord);
+    // console.log(req.headers);
+    // console.log(req.ip);
+
 
     res.send('token get ok!');
     res.end();
@@ -88,6 +104,14 @@ app.post('/api/test', (req, res) => {
 
 
     res.send('ok');
+});
+
+
+// 退出登录，将token加入到redis，
+app.post('/api/login/exit', async (req, res) => {
+
+
+
 });
 
 

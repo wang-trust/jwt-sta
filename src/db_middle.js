@@ -4,7 +4,7 @@ await mongoose.connect('mongodb://127.0.0.1:27017/test01', { autoIndex: false })
 
 
 
-const BookSchma = new mongoose.Schema({
+const UserSchma = new mongoose.Schema({
     uid: {
         type: Number,
         default: 0
@@ -14,33 +14,33 @@ const BookSchma = new mongoose.Schema({
     role: Number,
     aliasname: String,
     signupDate: {
-      type: Date,
-      default: Date.now
+        type: Date,
+        default: Date.now
     },
     isDelete: Number,
     oldPassword: String
-    },
+},
     {
         statics: {
-            async modelFind(username, password){
-                let res =  await this.findOne({'username': username, 'password': password}, {
+            async modelFind(username, password) {
+                let res = await this.findOne({ 'username': username, 'password': password }, {
                     _id: 0,
                     password: 0,
                     oldPassword: 0,
                     isDelete: 0,
                     __v: 0
                 });
-                
+
                 return res !== null ? res.toJSON() : null;
             },
-            async modelInsert(userObj){
-                if(userObj === null || userObj.username === null || userObj.password === null){
+            async modelInsert(userObj) {
+                if (userObj === null || userObj.username === null || userObj.password === null) {
                     return false;
                 }
                 let uid = await UserModel.modelGetUid();
                 return await UserModel.create({
-                    username : userObj.username,
-                    password : userObj.password,
+                    username: userObj.username,
+                    password: userObj.password,
                     role: 1,
                     aliasname: userObj.aliasname,
                     isDelete: 0,
@@ -48,9 +48,9 @@ const BookSchma = new mongoose.Schema({
                     uid: uid
                 });
             },
-            async modelGetUid(){
-                let res = await UserModel.find().sort({'uid': 'desc'}).limit(1);
-                if(res === null || res.length === 0){
+            async modelGetUid() {
+                let res = await UserModel.find().sort({ 'uid': 'desc' }).limit(1);
+                if (res === null || res.length === 0) {
                     return 0;
                 } else {
                     return res[0].uid + 1;
@@ -61,7 +61,42 @@ const BookSchma = new mongoose.Schema({
     }
 );
 
-const UserModel = mongoose.model('BookModel', BookSchma);
+const UserModel = mongoose.model('BookModel', UserSchma);
+
+
+const UserLoginLogSchema = new mongoose.Schema({
+    uid: Number,
+    username: String,
+    refer: String,
+    loginTime: {
+        type: Date,
+        default: Date.now
+    },
+    platform: String,
+    token: String,
+    ipaddress: String,
+    // isDone: Number,
+    isDelete: {
+        type: Number,
+        default: 0
+    }
+});
+
+const UserLoginLogModel = mongoose.model('UserLoginLogModel', UserLoginLogSchema);
+
+
+
+
+
+
+
+
+
+export {
+    UserModel,
+    UserLoginLogModel
+};
+
 
 // await UserModel.create({
 //     username: 'goupi1',
@@ -90,5 +125,5 @@ const UserModel = mongoose.model('BookModel', BookSchma);
 // let res = await UserModel.getFormatTime();
 
 
-export { UserModel };
+
 
