@@ -18,6 +18,7 @@
     - [项目使用框架及工具](#项目使用框架及工具)
   - [评审要点记录](#评审要点记录)
   - [面临问题](#面临问题)
+  - [Next work](#next-work)
 
 ## 1 项目背景及意义
 
@@ -77,7 +78,7 @@ const UserLoginLogModel = new mongoose.Schema({
     platform: String,
     token: String,
     ipaddress: String,
-    // isDone: Number, // 含义不明
+    isDone: Number, // 登录成功或失败
     isDelete: Number
 })
 ```
@@ -136,3 +137,7 @@ const LoginingModel = new mongoose.Schema({
 ## 面临问题
 
 1. MongoDB的时间格式处理
+
+## Next work
+
+1. 解决引入redis的问题，全部变量挂载使用

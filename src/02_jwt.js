@@ -5,13 +5,13 @@ import cookParser from "cookie-parser";
 
 import { FormatDate } from "./format.js";
 import { UserModel, UserLoginLogModel } from "./db_middle.js";
-import { crossDomainMiddleware, testMiddleWare } from "./middleWare/crossDomain.js";
+import { crossDomainMiddleware, testMiddleWare, globalVarMiddleWare } from "./middleWare/crossDomain.js";
+import { authenticationMiddleWare } from "./middleWare/authenticationMiddleWare.js";
 import { ResponseMsg } from "./config/struct.js";
 import { jwtInfo } from "./config/config.js";
 
 
 const app = new express();
-
 
 // get body 
 // -- 需要设置请求头哦数据类型application/json or xxx application/x-www-form-urlencoded
@@ -22,23 +22,18 @@ app.use(cookParser());
 
 // 全局中间件
 app.use(crossDomainMiddleware);
+app.use(globalVarMiddleWare);
+app.use(authenticationMiddleWare);
 app.use(testMiddleWare);
 
 
-// app.all('*', function (req, res, next) {
-//     // res.header("Access-Control-Allow-Origin", req.headers.origin); 
-//     // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//     // res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-//     // res.header("Access-Control-Allow-Credentials", true); 
-//     next();
+
+// app.get('/login', async (req, res) => {
+//     let v1 = await UserModel.modelFind('goupi2', '123456');
+
+//     v1.signupDate = FormatDate(v1.signupDate);
+//     res.send(v1);
 // });
-
-app.get('/login', async (req, res) => {
-    let v1 = await UserModel.modelFind('goupi2', '123456');
-
-    v1.signupDate = FormatDate(v1.signupDate);
-    res.send(v1);
-});
 
 
 app.post('/api/login', async (req, res) => {
@@ -49,6 +44,17 @@ app.post('/api/login', async (req, res) => {
     if (v1 === null) {
         res.status(404);
         res.send(ResponseMsg.ResponseErrorMsg('user not find'));
+
+        let userrecord = new UserLoginLogModel({
+            uid: 0,
+            username: req.body.username,
+            refer: req.headers.referer,
+            platform: null,
+            token: null,
+            isDone: 1,
+            ipaddress: req.get('x-real-ip')
+        });
+        await userrecord.save();
         return;
     }
 
@@ -91,28 +97,54 @@ app.post('/api/login', async (req, res) => {
     // console.log(userrecord);
     // console.log(req.headers);
     // console.log(req.ip);
+    console.log(req.path);
+    console.log(req.url);
 
 
-    res.send('token get ok!');
-    res.end();
+    // res.send('token get ok!');r
+    res.send(ResponseMsg.ResponseRightMsg('login succeed'));
 });
 
 
 app.post('/api/test', (req, res) => {
     console.log('api /test');
-    console.log(req.get('Cookie'));
+    console.log(req.cookies['wangtrust_uid']);
+
+    // req.jwtVar.invalidToken.unshift(req.cookies['wangtrust_uid']);
+    // req.jwtVar.invalidToken.foreach();
+    // console.log(req.jwtVar.invalidToken.length());
 
 
-    res.send('ok');
+    if(req.right === -1){
+        res.send(ResponseMsg.ResponseErrorMsg('test error!'));
+    } else {
+        res.send(ResponseMsg.ResponseRightMsg('test ok!'));
+
+    }
+
 });
 
 
 // 退出登录，将token加入到redis，
 app.post('/api/login/exit', async (req, res) => {
+    if(req.cookies['wangtrust_uid'] === undefined) {
+        res.send(ResponseMsg.ResponseErrorMsg('ACCESS ERROR'));
+        return;
+    }
 
-
-
+    req.jwtVar.invalidToken.unshift(req.cookies['wangtrust_uid']);
+    req.jwtVar.invalidToken.foreach();
+    console.log(req.jwtVar.invalidToken.length());
+    
+    res.send(ResponseMsg.ResponseRightMsg('exit succeed!'));
 });
+
+
+
+
+app.all('*', (req, res) => {
+    res.send('error');
+})
 
 
 

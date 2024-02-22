@@ -55,6 +55,10 @@ class LinkedList {
         return null;
     }
 
+    length(){
+        return this.size;
+    }
+
     foreach() {
         let curnode = this.head;
         console.log('foreach start------------')
@@ -81,6 +85,7 @@ class LinkedList {
 // l1.foreach();
 
 export {
-    LinkedList
+    LinkedList,
+    Node
 }
 

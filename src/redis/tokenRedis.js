@@ -1,4 +1,4 @@
-import { LinkedList } from "../model/linkedList.js";
+import { LinkedList, Node } from "../model/linkedList.js";
 import { TokenModel } from "../model/tokenModel.js";
 
 
@@ -15,6 +15,23 @@ class TokenRedisList extends LinkedList {
             curnode = curnode.next;
         }
         return null;
+    }
+
+    unshift(element) {
+        let res = this.getNode(element);
+        if(res !== null) {
+            return "Already exists";
+        }
+
+        let newNode = new Node(new TokenModel(element), null, null);
+
+        newNode.next = this.head;
+        if (this.head !== null) {
+            this.head.prev = newNode;
+        }
+        this.head = newNode;
+        this.size++;
+        return 0;
     }
 
 }

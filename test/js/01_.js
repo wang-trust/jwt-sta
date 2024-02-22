@@ -8,6 +8,7 @@ var testDic = {
 
 function setonclick() {
     document.querySelector('#login-btn').onclick = loginBtn;
+    document.querySelector('#login-exit').onclick = loginExit;
     document.querySelector('#login-test').onclick = loginTest;
 
 }
@@ -49,6 +50,27 @@ function loginTest() {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.open('POST', testDic.urlhead + '/test');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.withCredentials = true;
+    
+    xhr.send(JSON.stringify(v1));
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            console.log('login succeed');
+        }
+    };
+}
+
+
+function loginExit() {
+    let v1, v2, v3, v4, v5, v6;
+
+    v1 = { a: 1};
+    console.log('exit-btn ok');
+
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.open('POST', testDic.urlhead + '/login/exit');
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.withCredentials = true;
     

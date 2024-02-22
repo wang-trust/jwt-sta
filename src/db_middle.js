@@ -75,7 +75,10 @@ const UserLoginLogSchema = new mongoose.Schema({
     platform: String,
     token: String,
     ipaddress: String,
-    // isDone: Number,
+    isDone: {
+        type: Number,
+        default: 0
+    },
     isDelete: {
         type: Number,
         default: 0
