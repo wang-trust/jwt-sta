@@ -42,7 +42,7 @@ app.post('/api/login', async (req, res) => {
     let v1 = await UserModel.modelFind(req.body.username, req.body.password);
     // console.log(v1);
     if (v1 === null) {
-        res.status(404);
+        res.status(200);
         res.send(ResponseMsg.ResponseErrorMsg('user not find'));
 
         let userrecord = new UserLoginLogModel({
@@ -101,27 +101,8 @@ app.post('/api/login', async (req, res) => {
     console.log(req.url);
 
 
-    // res.send('token get ok!');r
+    // res.send('token get ok!');
     res.send(ResponseMsg.ResponseRightMsg('login succeed'));
-});
-
-
-app.post('/api/test', (req, res) => {
-    console.log('api /test');
-    console.log(req.cookies['wangtrust_uid']);
-
-    // req.jwtVar.invalidToken.unshift(req.cookies['wangtrust_uid']);
-    // req.jwtVar.invalidToken.foreach();
-    // console.log(req.jwtVar.invalidToken.length());
-
-
-    if(req.right === -1){
-        res.send(ResponseMsg.ResponseErrorMsg('test error!'));
-    } else {
-        res.send(ResponseMsg.ResponseRightMsg('test ok!'));
-
-    }
-
 });
 
 
@@ -138,6 +119,22 @@ app.post('/api/login/exit', async (req, res) => {
     
     res.send(ResponseMsg.ResponseRightMsg('exit succeed!'));
 });
+
+app.post('/api/test', (req, res) => {
+    console.log('api /test');
+    console.log(req.cookies['wangtrust_uid']);
+
+    // req.jwtVar.invalidToken.unshift(req.cookies['wangtrust_uid']);
+    // req.jwtVar.invalidToken.foreach();
+    // console.log(req.jwtVar.invalidToken.length());
+    console.log(req.userinfo);
+
+    res.send(ResponseMsg.ResponseRightMsg('test ok!'));
+
+});
+
+
+
 
 
 

@@ -141,3 +141,4 @@ const LoginingModel = new mongoose.Schema({
 ## Next work
 
 1. 解决引入redis的问题，全部变量挂载使用
+2. jwt鉴权，全局中间件拦截实现

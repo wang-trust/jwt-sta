@@ -17,6 +17,11 @@ class TokenRedisList extends LinkedList {
         return null;
     }
 
+    getInvalid(token){
+        let res = this.getNode(token);
+        return res ? res.element : null;
+    }
+
     unshift(element) {
         let res = this.getNode(element);
         if(res !== null) {
