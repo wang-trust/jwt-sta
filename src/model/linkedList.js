@@ -30,7 +30,9 @@ class LinkedList {
     remove(token){
         let res = this.getNode(token);
         if(res === null) return 0;
-        if(res.prev === null){
+        if(res.prev === null && res.next === null){
+            this.head = null;
+        } else if(res.prev === null){
             this.head = res.next;
             this.head.prev = null;
         } else if (res.next === null){

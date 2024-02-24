@@ -94,11 +94,15 @@ app.post('/api/login', async (req, res) => {
     });
     await userrecord.save();
 
+    // 在线统计
+    req.jwtVar.validRecord.unshift(token);
+    req.jwtVar.validRecord.foreach();
+    
     // console.log(userrecord);
     // console.log(req.headers);
     // console.log(req.ip);
-    console.log(req.path);
-    console.log(req.url);
+    // console.log(req.path);
+    // console.log(req.url);
 
 
     // res.send('token get ok!');
@@ -108,26 +112,40 @@ app.post('/api/login', async (req, res) => {
 
 // 退出登录，将token加入到redis，
 app.post('/api/login/exit', async (req, res) => {
-    if(req.cookies['wangtrust_uid'] === undefined) {
-        res.send(ResponseMsg.ResponseErrorMsg('ACCESS ERROR'));
-        return;
-    }
+    // if(req.cookies['wangtrust_uid'] === undefined) {
+    //     res.send(ResponseMsg.ResponseErrorMsg('ACCESS ERROR'));
+    //     return;
+    // }
 
     req.jwtVar.invalidToken.unshift(req.cookies['wangtrust_uid']);
-    req.jwtVar.invalidToken.foreach();
-    console.log(req.jwtVar.invalidToken.length());
+    // req.jwtVar.invalidToken.foreach();
+    // console.log(req.jwtVar.invalidToken.length());
+    let userrecord = new UserLoginLogModel({
+        uid: req.userinfo.uid,
+        username: req.userinfo.username,
+        refer: req.headers.referer,
+        platform: null,
+        token: req.cookies['wangtrust_uid'],
+        isDone: 2, // 表示退出登录
+        ipaddress: req.get('x-real-ip')
+    });
+    console.log(userrecord);
+    await userrecord.save();
+
+    req.jwtVar.validRecord.remove(req.cookies['wangtrust_uid']);
+    req.jwtVar.validRecord.foreach();
     
     res.send(ResponseMsg.ResponseRightMsg('exit succeed!'));
 });
 
 app.post('/api/test', (req, res) => {
     console.log('api /test');
-    console.log(req.cookies['wangtrust_uid']);
+    // console.log(req.cookies['wangtrust_uid']);
 
     // req.jwtVar.invalidToken.unshift(req.cookies['wangtrust_uid']);
     // req.jwtVar.invalidToken.foreach();
     // console.log(req.jwtVar.invalidToken.length());
-    console.log(req.userinfo);
+    // console.log(req.userinfo);
 
     res.send(ResponseMsg.ResponseRightMsg('test ok!'));
 

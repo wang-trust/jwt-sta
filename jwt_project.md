@@ -78,7 +78,7 @@ const UserLoginLogModel = new mongoose.Schema({
     platform: String,
     token: String,
     ipaddress: String,
-    isDone: Number, // 登录成功或失败
+    isDone: Number, // 0登录成功 1登录失败 2退出登录。。。
     isDelete: Number
 })
 ```
@@ -140,5 +140,10 @@ const LoginingModel = new mongoose.Schema({
 
 ## Next work
 
-1. 解决引入redis的问题，全部变量挂载使用
-2. jwt鉴权，全局中间件拦截实现
+1. 解决引入redis的问题，全部变量挂载使用 -get
+2. jwt鉴权，全局中间件拦截实现 -get
+3. 退出登录记录 -get
+4. refresh记录
+5. 当前在线用户统计 -get
+6. redis中对数据做定时操作，去除无效token
+7. redis数据持久化

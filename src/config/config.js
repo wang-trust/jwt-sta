@@ -16,7 +16,7 @@ const jwtFillterPath = [
 // 配置全局变量
 var jwtVar = {};
 jwtVar['invalidToken'] = new TokenRedisList();
-
+jwtVar['validRecord'] = new TokenRedisList();
 
 
 export {
