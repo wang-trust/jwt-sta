@@ -3,7 +3,7 @@ window.onload = function () {
 }
 
 var testDic = {
-    urlhead: 'https://v4server.wangtrust.top:9611/api'
+    urlhead: 'https://v4server.wangtrust.top:9611/api' + '/jwt'
 }
 
 function setonclick() {
@@ -29,7 +29,7 @@ function loginBtn() {
 
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.open('POST', testDic.urlhead + '/login');
+    xhr.open('POST', testDic.urlhead + '/login/refreshtoken');
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.withCredentials = true;
     xhr.send(v5);
@@ -49,7 +49,7 @@ function loginTest() {
 
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.open('POST', testDic.urlhead + '/test');
+    xhr.open('POST', testDic.urlhead + '/login/test');
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.withCredentials = true;
     
@@ -65,16 +65,13 @@ function loginTest() {
 function loginExit() {
     let v1, v2, v3, v4, v5, v6;
 
-    v1 = { a: 1};
     console.log('exit-btn ok');
-
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.open('POST', testDic.urlhead + '/login/exit');
-    xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.withCredentials = true;
     
-    xhr.send(JSON.stringify(v1));
+    xhr.send();
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             console.log('login succeed');

@@ -2,7 +2,7 @@ import { LinkedList, Node } from "../model/linkedList.js";
 import { TokenModel } from "../model/tokenModel.js";
 
 
-class TokenRedisList extends LinkedList {
+class TokenRedis extends LinkedList {
     constructor() {
         super();
     }
@@ -17,18 +17,20 @@ class TokenRedisList extends LinkedList {
         return null;
     }
 
-    getInvalid(token){
+    getInvalid(token) {
         let res = this.getNode(token);
         return res ? res.element : null;
     }
 
-    unshift(element) {
-        let res = this.getNode(element);
-        if(res !== null) {
+    unshift(token) {
+        let res = this.getNode(token);
+        if (res !== null) {
             return "Already exists";
         }
 
-        let newNode = new Node(new TokenModel(element), null, null);
+        let element = new TokenModel(token);
+        if(element['token'] === null) return "token error";
+        let newNode = new Node(element, null, null);
 
         newNode.next = this.head;
         if (this.head !== null) {
@@ -39,20 +41,34 @@ class TokenRedisList extends LinkedList {
         return 0;
     }
 
+    getAllData(){
+        let res = [];
+        
+        let curnode = this.head;
+        while(curnode !== null){
+            res.push(curnode.element);
+            curnode = curnode.next;
+        }
+
+        return JSON.stringify(res);
+    }
+
+    clearTimeout(){
+        let curnode = this.head;
+
+        this.head = null;
+        this.size = 0;
+
+        while(curnode !== null){
+            this.unshift(curnode.element.token);
+            curnode = curnode.next;
+        }
+
+    }
+
 }
 
 
 export {
-    TokenRedisList
+    TokenRedis
 }
-
-// let l1 = new TokenRedisList();
-// l1.unshift(new TokenModel('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoiZ291cGkxIiwicm9sZSI6MSwiaXNzdWVyIjoid2FuZ3RydXN0LnRvcCIsImF1ZGllbmNlIjoid2FuZ3RydXN0LnRvcCIsInBsYXRmb3JtIjpudWxsLCJpYXQiOjE3MDg1MTEzMjcsImV4cCI6MTcwODU0NzMyN30.VbLJ8VjjaWBM7roaGH3VhQbhW3UzyPnYi6KgIVskqtc'));
-// l1.unshift(new TokenModel('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoiZ291cGkxIiwicm9sZSI6MSwiaXNzdWVyIjoid2FuZ3RydXN0LnRvcCIsImF1ZGllbmNlIjoid2FuZ3RydXN0LnRvcCIsInBsYXRmb3JtIjpudWxsLCJpYXQiOjE3MDg1MTEzMjcsImV4cCI6MTcwODU0NzMyN30.VbLJ8VjjaWBM7roaGH3VhQbhW3UzyPnYi6KgIVskqtc'));
-// l1.unshift(new TokenModel('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoiZ291cGkxIiwicm9sZSI6MSwiaXNzdWVyIjoid2FuZ3RydXN0LnRvcCIsImF1ZGllbmNlIjoid2FuZ3RydXN0LnRvcCIsInBsYXRmb3JtIjpudWxsLCJpYXQiOjE3MDg0OTMxMDYsImV4cCI6MTcwODUyOTEwNn0.h_PD70teVEiMBHUFH7I7P6V4RunmOyMysXsEcaFfCK8'));
-// l1.unshift(new TokenModel('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoiZ291cGkxIiwicm9sZSI6MSwiaXNzdWVyIjoid2FuZ3RydXN0LnRvcCIsImF1ZGllbmNlIjoid2FuZ3RydXN0LnRvcCIsInBsYXRmb3JtIjpudWxsLCJpYXQiOjE3MDg0OTMxMDYsImV4cCI6MTcwODUyOTEwNn0.h_PD70teVEiMBHUFH7I7P6V4RunmOyMysXsEcaFfCK8'));
-
-
-
-// l1.foreach();
-// console.log(l1.getNode('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoiZ291cGkxIiwicm9sZSI6MSwiaXNzdWVyIjoid2FuZ3RydXN0LnRvcCIsImF1ZGllbmNlIjoid2FuZ3RydXN0LnRvcCIsInBsYXRmb3JtIjpudWxsLCJpYXQiOjE3MDg1MTEzMjcsImV4cCI6MTcwODU0NzMyN30.VbLJ8VjjaWBM7roaGH3VhQbhW3UzyPnYi6KgIVskqtc'));

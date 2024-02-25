@@ -1,30 +1,28 @@
 import express from "express";
-import bodyParser from "body-parser";
 import jwt from "jsonwebtoken";
+import bodyParser from "body-parser";
 import cookParser from "cookie-parser";
 
-import { FormatDate } from "./format.js";
-import { UserModel, UserLoginLogModel } from "./db_middle.js";
-import { crossDomainMiddleware, testMiddleWare, globalVarMiddleWare } from "./middleWare/crossDomain.js";
-import { authenticationMiddleWare } from "./middleWare/authenticationMiddleWare.js";
-import { ResponseMsg } from "./config/struct.js";
-import { jwtInfo } from "./config/config.js";
+
+import { UserModel, UserLoginLogModel } from "../db/mongoMiddle.js";
+import { ResponseMsg } from "../config/struct.js";
+import { jwtInfo } from "../config/config.js";
 
 
-const app = new express();
+const loginrouter = new express();
 
-// get body 
-// -- 需要设置请求头哦数据类型application/json or xxx application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// // get body 
+// // -- 需要设置请求头哦数据类型application/json or xxx application/x-www-form-urlencoded
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
 
-app.use(cookParser());
+// app.use(cookParser());
 
-// 全局中间件
-app.use(crossDomainMiddleware);
-app.use(globalVarMiddleWare);
-app.use(authenticationMiddleWare);
-app.use(testMiddleWare);
+// // 全局中间件
+// app.use(crossDomainMiddleware);
+// app.use(globalVarMiddleWare);
+// app.use(authenticationMiddleWare);
+// app.use(testMiddleWare);
 
 
 
@@ -36,8 +34,7 @@ app.use(testMiddleWare);
 // });
 
 
-app.post('/api/login', async (req, res) => {
-    console.log('post test')
+loginrouter.post('/login/refreshtoken', async (req, res) => {
     // console.log(req.body);
     let v1 = await UserModel.modelFind(req.body.username, req.body.password);
     // console.log(v1);
@@ -73,11 +70,12 @@ app.post('/api/login', async (req, res) => {
         }
     );
 
-    console.log(token);
+    // console.log(token);
     // res.header("Access-Control-Allow-Credentials", "true");
 
     res.cookie('wangtrust_uid', token, {
-        maxAge: 60 * 60 * 24 * 1000,
+        // maxAge: 60 * 60 * 24 * 1000,
+        maxAge: jwtInfo.refreshtoken * 1000,
         sameSite: 'none',
         secure: 'auto',
         httpOnly: true
@@ -96,7 +94,7 @@ app.post('/api/login', async (req, res) => {
 
     // 在线统计
     req.jwtVar.validRecord.unshift(token);
-    req.jwtVar.validRecord.foreach();
+    // req.jwtVar.validRecord.foreach();
     
     // console.log(userrecord);
     // console.log(req.headers);
@@ -104,19 +102,13 @@ app.post('/api/login', async (req, res) => {
     // console.log(req.path);
     // console.log(req.url);
 
-
-    // res.send('token get ok!');
+    console.log('token get ok!');
     res.send(ResponseMsg.ResponseRightMsg('login succeed'));
 });
 
 
 // 退出登录，将token加入到redis，
-app.post('/api/login/exit', async (req, res) => {
-    // if(req.cookies['wangtrust_uid'] === undefined) {
-    //     res.send(ResponseMsg.ResponseErrorMsg('ACCESS ERROR'));
-    //     return;
-    // }
-
+loginrouter.post('/login/exit', async (req, res) => {
     req.jwtVar.invalidToken.unshift(req.cookies['wangtrust_uid']);
     // req.jwtVar.invalidToken.foreach();
     // console.log(req.jwtVar.invalidToken.length());
@@ -133,12 +125,13 @@ app.post('/api/login/exit', async (req, res) => {
     await userrecord.save();
 
     req.jwtVar.validRecord.remove(req.cookies['wangtrust_uid']);
-    req.jwtVar.validRecord.foreach();
+    // req.jwtVar.validRecord.foreach();
     
+    console.log('exit succeed!');
     res.send(ResponseMsg.ResponseRightMsg('exit succeed!'));
 });
 
-app.post('/api/test', (req, res) => {
+loginrouter.post('/login/test', (req, res) => {
     console.log('api /test');
     // console.log(req.cookies['wangtrust_uid']);
 
@@ -152,20 +145,12 @@ app.post('/api/test', (req, res) => {
 });
 
 
-
-
-
-
-
-app.all('*', (req, res) => {
-    res.send('error');
+loginrouter.all('*', (req, res) => {
+    res.send(ResponseMsg.ResponseRightMsg('Not find!'));
 })
 
 
 
-app.listen(9613, () => {
-    console.log('server start...');
-});
-
-
-
+export {
+    loginrouter
+}

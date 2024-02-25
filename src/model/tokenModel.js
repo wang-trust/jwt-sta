@@ -3,29 +3,44 @@ import jwt from "jsonwebtoken";
 
 import { jwtInfo } from '../config/config.js';
 
-// const LoginingModel = new mongoose.Schema({
-//     uid: Number,
-//     username: String,
-//     token: String,
-//     platform: String,
-//     loginTime: {
-//       type: Date,
-//       default: Date.now
-//     },
-//     duration: Number
-// })
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImdvdXBpMSIsInJvbGUiOjEsImlzc3VlciI6ImdvdXBpMTIzNDU2IiwiYXVkaWVuY2UiOiJ3YW5ndHJ1c3QudG9wIiwicGxhdGZvcm0iOm51bGwsImlhdCI6MTcwODQ5MjExNSwiZXhwIjoxNzA4NTI4MTE1fQ.GYnNkTfLuYIJMmALeOGtmafn_XbDHjOT_ioD0l5pFOs
+
+// function tokenModel(token){
+//     let res;
+//     new Promise()
+//     jwt.verify(token, jwtInfo.secret, (err, data) => {
+//         if (!err) {
+//             // if(data === null){
+//             //     console.log('data is null');
+//             //     console.log(data);
+//             // }
+//             if (data.issuer === jwtInfo.issuer) {
+//                 console.log('issuer debug');
+//                 console.log(data);
+//                 let res =  {
+//                     token: token,
+//                     uid: data.uid,
+//                     username: data.username,
+//                     role: data.role,
+//                     platform: data.platform,
+//                     iatTime: data.iat,
+//                     expTime: data.exp
+//                 };
+//             } else {
+//                 res = null;
+//             }
+//         } else {
+//             res =  null;
+//         }
+//     });
+//     return res;
+// }
 
 class TokenModel {
     constructor(token) {
         // this.token = token;
         jwt.verify(token, jwtInfo.secret, (err, data) => {
             if (!err) {
-                // if(data === null){
-                //     console.log('data is null');
-                //     console.log(data);
-                // }
                 if (data.issuer === jwtInfo.issuer) {
                     this.token = token;
                     this.uid = data.uid;
@@ -35,9 +50,13 @@ class TokenModel {
                     this.iatTime = data.iat;
                     this.expTime = data.exp;
                     // console.log(data);
+                } else {
+                    this.token = null;
                 }
+            } else {
+                this.token = null;
             }
-        })
+        });
     }
 }
 
