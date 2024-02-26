@@ -1,5 +1,5 @@
 
-function FormatDate(time){
+function formatDate(time){
     let year = time.getFullYear();
     let month = (time.getMonth()+1).toString().padStart(2,'0');
     let day = time.getDate().toString().padStart(2,'0');
@@ -12,5 +12,5 @@ function FormatDate(time){
 }
 
 export {
-    FormatDate
+    formatDate
 }

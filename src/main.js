@@ -11,7 +11,7 @@ import { jwtInfo } from "./config/config.js";
 import { UserModel, UserLoginLogModel } from "./db/mongoMiddle.js";
 import { crossDomainMiddleware, testMiddleWare, globalVarMiddleWare } from "./middleWare/crossDomain.js";
 import { authenticationMiddleWare } from "./middleWare/authenticationMiddleWare.js";
-
+import { logMiddleWare } from "./middleWare/logMiddleWare.js";
 
 const app = new express();
 
@@ -24,17 +24,21 @@ app.use(cookParser());
 
 
 // 全局中间件
-app.use(crossDomainMiddleware);
+app.use(logMiddleWare);
 app.use(globalVarMiddleWare);
+app.use(crossDomainMiddleware);
 app.use(authenticationMiddleWare);
 app.use(testMiddleWare);
+
 
 // 路由使用
 app.use('/api/jwt/', loginrouter);
 
 
+
+// error处理
 app.all('*', (req, res) => {
-    res.send('error');
+    res.send(ResponseMsg.ResponseErrorMsg('Not find!'));
 })
 
 

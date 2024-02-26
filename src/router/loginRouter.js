@@ -2,42 +2,25 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import bodyParser from "body-parser";
 import cookParser from "cookie-parser";
+import { dirname } from "node:path"
+import { fileURLToPath } from "node:url"
 
 
 import { UserModel, UserLoginLogModel } from "../db/mongoMiddle.js";
 import { ResponseMsg } from "../config/struct.js";
 import { jwtInfo } from "../config/config.js";
+import { logCtrl } from "../config/logCtrl.js";
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const loginrouter = new express();
-
-// // get body 
-// // -- 需要设置请求头哦数据类型application/json or xxx application/x-www-form-urlencoded
-// app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(bodyParser.json());
-
-// app.use(cookParser());
-
-// // 全局中间件
-// app.use(crossDomainMiddleware);
-// app.use(globalVarMiddleWare);
-// app.use(authenticationMiddleWare);
-// app.use(testMiddleWare);
-
-
-
-// app.get('/login', async (req, res) => {
-//     let v1 = await UserModel.modelFind('goupi2', '123456');
-
-//     v1.signupDate = FormatDate(v1.signupDate);
-//     res.send(v1);
-// });
 
 
 loginrouter.post('/login/refreshtoken', async (req, res) => {
     // console.log(req.body);
     let v1 = await UserModel.modelFind(req.body.username, req.body.password);
-    // console.log(v1);
     if (v1 === null) {
         res.status(200);
         res.send(ResponseMsg.ResponseErrorMsg('user not find'));
@@ -69,9 +52,7 @@ loginrouter.post('/login/refreshtoken', async (req, res) => {
             expiresIn: jwtInfo.refreshtoken
         }
     );
-
     // console.log(token);
-    // res.header("Access-Control-Allow-Credentials", "true");
 
     res.cookie('wangtrust_uid', token, {
         // maxAge: 60 * 60 * 24 * 1000,
@@ -79,7 +60,6 @@ loginrouter.post('/login/refreshtoken', async (req, res) => {
         sameSite: 'none',
         secure: 'auto',
         httpOnly: true
-        // domain: 'wangtrust.top:9611'
     });
 
     let userrecord = new UserLoginLogModel({
@@ -140,13 +120,15 @@ loginrouter.post('/login/test', (req, res) => {
     // console.log(req.jwtVar.invalidToken.length());
     // console.log(req.userinfo);
 
+    logCtrl.logInfo('api /test', req);
+
     res.send(ResponseMsg.ResponseRightMsg('test ok!'));
 
 });
 
 
 loginrouter.all('*', (req, res) => {
-    res.send(ResponseMsg.ResponseRightMsg('Not find!'));
+    res.send(ResponseMsg.ResponseErrorMsg('Not find!'));
 })
 
 

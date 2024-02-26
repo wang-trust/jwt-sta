@@ -15,8 +15,15 @@ const jwtFillterPath = [
 ];
 
 const localizationRedis = {
-    invalidToken: 10, // s
-    validRecord: 10  // s
+    invalidToken: 60, // s
+    validRecord: 60  // s
+}
+
+const logConfig = {
+    filename: 'jwtlog.log',
+    intervalTime: 60 * 60 * 1000,  // ms
+    size: '1MB',
+    level: 1 // 1 debug 2 info 3 warning
 }
 
 // 配置全局变量
@@ -28,5 +35,6 @@ jwtVar['validRecord'] = new ValidRecord('validRecord.json', localizationRedis.va
 export {
     jwtInfo,
     jwtVar,
-    jwtFillterPath
+    jwtFillterPath,
+    logConfig
 }
