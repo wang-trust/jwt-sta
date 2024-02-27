@@ -64,30 +64,51 @@ class LogCtrl {
     }
 
     // 自定义 log
-    wlogDebug(msg, filename){
-        // :date[iso] INFO (src/econ_web.c) :remote-addr :method :url :user-agent msg
+    wlogDebug(msg, filename, req) {
+        if (this.config.level <= 1) {
+            this.wlogbase(msg, filename, req, 'DEBUG');
+        }
+    }
+    wlogInfo(msg, filename, req) {
+        if (this.config.level <= 2) {
+            this.wlogbase(msg, filename, req, 'INFO');
+        }
+    }
+    wlogWarning(msg, filename, req) {
+        if (this.config.level <= 3) {
+            this.wlogbase(msg, filename, req, 'WARNING');
+        }
+    }
 
+    wlogbase(msg, filename, req, level) {
+        let date = formatDate(new Date());
+        let remoteAaddr = req.get('x-real-ip');
+        let method = req.method;
+        let url = req.url;
 
+        // :date[iso] INFO (src/econ_web.c) :remote-addr :method :url msg
+        let log = `${date} ${level} (${filename}) ${remoteAaddr} ${method} ${url} [${msg}]\n`;
+        this.ws.write(log);
     }
 
     // api log
     logDebug(msg, req) {
-        if(this.config.level <= 1){
+        if (this.config.level <= 1) {
             this.logbase(msg, req, 'DEBUG');
         }
     }
     logInfo(msg, req) {
-        if(this.config.level <= 2){
+        if (this.config.level <= 2) {
             this.logbase(msg, req, 'INFO');
         }
     }
     logWarning(msg, req) {
-        if(this.config.level <= 3){
-            this.logbase(msg, filename, req, 'WARNING');
+        if (this.config.level <= 3) {
+            this.logbase(msg, req, 'WARNING');
         }
     }
 
-    logbase(msg, req, level){
+    logbase(msg, req, level) {
         let date = formatDate(new Date());
         let remoteAaddr = req.get('x-real-ip');
         let method = req.method;
@@ -119,7 +140,7 @@ class LogCtrl {
         return size;
     }
 
-    newlogfile(){
+    newlogfile() {
         // 判断是否存在
         if (fs.existsSync(this.path)) {
             let stat = fs.statSync(this.path);
@@ -133,13 +154,13 @@ class LogCtrl {
                 dircontent.forEach(file => {
                     let temp = file.replace(fileName, '');
                     let tempNum = Number(temp);
-                    if(tempNum >= 0 && tempNum > this.index){
+                    if (tempNum >= 0 && tempNum > this.index) {
                         this.index = tempNum;
                     }
                 });
                 let newfileName = `${this.path}.${++this.index}`;
-                
-                if(this.ws){
+
+                if (this.ws) {
                     this.ws.close();
                     this.ws = null;
                 }

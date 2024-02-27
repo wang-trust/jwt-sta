@@ -3,12 +3,14 @@ window.onload = function () {
 }
 
 var testDic = {
-    urlhead: 'https://v4server.wangtrust.top:9611/api' + '/jwt'
+    // urlhead: 'https://v4server.wangtrust.top:9611/api' + '/jwt';
+    urlhead: 'https://v4server.wangtrust.top/api' + '/jwt'
 }
 
 function setonclick() {
     document.querySelector('#login-btn').onclick = loginBtn;
     document.querySelector('#login-exit').onclick = loginExit;
+    document.querySelector('#login-access').onclick = loginAccess;
     document.querySelector('#login-test').onclick = loginTest;
 
 }
@@ -29,7 +31,7 @@ function loginBtn() {
 
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.open('POST', testDic.urlhead + '/login/refreshtoken');
+    xhr.open('POST', testDic.urlhead + '/login/refresh');
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.withCredentials = true;
     xhr.send(v5);
@@ -75,6 +77,22 @@ function loginExit() {
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             console.log('login succeed');
+        }
+    };
+}
+function loginAccess() {
+    let v1, v2, v3, v4, v5, v6;
+
+    console.log('access-btn ok');
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.open('POST', testDic.urlhead + '/login/access');
+    xhr.withCredentials = true;
+    
+    xhr.send();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            console.log(xhr.response.token);
         }
     };
 }

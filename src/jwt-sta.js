@@ -1,3 +1,4 @@
+#!/usr/local/bin/node
 import express from "express";
 import bodyParser from "body-parser";
 import jwt from "jsonwebtoken";

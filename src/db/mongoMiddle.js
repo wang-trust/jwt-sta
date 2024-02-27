@@ -74,6 +74,7 @@ const UserLoginLogSchema = new mongoose.Schema({
     },
     platform: String,
     token: String,
+    cookies: String,
     ipaddress: String,
     isDone: {
         type: Number,

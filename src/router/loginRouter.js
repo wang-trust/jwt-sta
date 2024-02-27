@@ -18,7 +18,7 @@ const __dirname = dirname(__filename);
 const loginrouter = new express();
 
 
-loginrouter.post('/login/refreshtoken', async (req, res) => {
+loginrouter.post('/login/refresh', async (req, res) => {
     // console.log(req.body);
     let v1 = await UserModel.modelFind(req.body.username, req.body.password);
     if (v1 === null) {
@@ -28,7 +28,7 @@ loginrouter.post('/login/refreshtoken', async (req, res) => {
         let userrecord = new UserLoginLogModel({
             uid: 0,
             username: req.body.username,
-            refer: req.headers.referer,
+            refer: req.headers.origin,
             platform: null,
             token: null,
             isDone: 1,
@@ -44,7 +44,7 @@ loginrouter.post('/login/refreshtoken', async (req, res) => {
             username: v1.username,
             role: v1.role,
             issuer: jwtInfo.issuer,
-            audience: jwtInfo.audience,
+            audience: req.headers.origin,
             platform: null
         },
         jwtInfo.secret,
@@ -67,7 +67,7 @@ loginrouter.post('/login/refreshtoken', async (req, res) => {
         username: v1.username,
         refer: req.headers.referer,
         platform: null,
-        token: token,
+        cookies: token,
         ipaddress: req.get('x-real-ip')
     });
     await userrecord.save();
@@ -97,7 +97,8 @@ loginrouter.post('/login/exit', async (req, res) => {
         username: req.userinfo.username,
         refer: req.headers.referer,
         platform: null,
-        token: req.cookies['wangtrust_uid'],
+        // token: req.cookies['wangtrust_uid'],
+        cookies: req.cookies['wangtrust_uid'],
         isDone: 2, // 表示退出登录
         ipaddress: req.get('x-real-ip')
     });
@@ -111,6 +112,62 @@ loginrouter.post('/login/exit', async (req, res) => {
     res.send(ResponseMsg.ResponseRightMsg('exit succeed!'));
 });
 
+loginrouter.post('/login/access', async (req, res) => {
+    console.log('[/login/accesstoken] test');
+    let userrecord = new UserLoginLogModel({
+        uid: req.userinfo.uid,
+        username: req.userinfo.username,
+        refer: req.headers.origin,
+        platform: null,
+        cookies: req.cookies['wangtrust_uid'],
+        isDone: 3, // 3表示cookies验证失败
+        ipaddress: req.get('x-real-ip')
+    });
+    // 对cookies信息进行校验
+    if(req.userinfo.issuer !== jwtInfo.issuer || req.userinfo.audience !== req.headers.origin){
+        res.send(ResponseMsg.ResponseErrorMsg('cookie error'));
+        await userrecord.save();
+        return;
+    }
+    // let v1 = await UserModel.modelFind(req.body.username, req.body.password);
+    let findres = await UserModel.findOne({
+        uid: req.userinfo.uid,
+        username: req.userinfo.username
+        // username: '123'
+    });
+    if(findres === null){
+        res.send(ResponseMsg.ResponseErrorMsg('cookie error'));
+        await userrecord.save();
+        return;
+    }
+
+    // 生成token
+    let token = jwt.sign(
+        {
+            uid: req.userinfo.uid,
+            username: req.userinfo.username,
+            role: req.userinfo.role,
+            issuer: jwtInfo.accesssecret,
+            audience: req.headers.origin,
+            platform: null
+        },
+        jwtInfo.secret,
+        {
+            expiresIn: jwtInfo.accesstoken
+        }
+    );
+
+    console.log(`access token: [${token}]`);
+    userrecord.isDone = 4;
+    userrecord.token = token;
+    // console.log(userrecord);
+
+    await userrecord.save();
+    res.send(ResponseMsg.ResponseRightMsg({token: token}));
+});
+
+
+
 loginrouter.post('/login/test', (req, res) => {
     console.log('api /test');
     // console.log(req.cookies['wangtrust_uid']);
@@ -119,8 +176,12 @@ loginrouter.post('/login/test', (req, res) => {
     // req.jwtVar.invalidToken.foreach();
     // console.log(req.jwtVar.invalidToken.length());
     // console.log(req.userinfo);
+    // console.log(req.headers.referer);
+    // console.log(req.headers.origin);
+    // console.log(req.userinfo);
 
-    logCtrl.logInfo('api /test', req);
+    logCtrl.logInfo('wwww--api /test', req);
+    logCtrl.wlogInfo('wwww--api /test', __filename, req);
 
     res.send(ResponseMsg.ResponseRightMsg('test ok!'));
 

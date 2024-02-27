@@ -8,8 +8,8 @@
       - [API地址命名要求](#api地址命名要求)
       - [API的安全访问](#api的安全访问)
     - [项目API需求](#项目api需求)
-      - [access-token `/login/accesstoken`](#access-token-loginaccesstoken)
-      - [refresh-token `/login/refreshtoken`](#refresh-token-loginrefreshtoken)
+      - [access-token `/login/access`](#access-token-loginaccess)
+      - [refresh-token `/login/refresh`](#refresh-token-loginrefresh)
       - [退出登录 `/login/exit`](#退出登录-loginexit)
       - [获取所有用户登录记录 `/api/login/log`](#获取所有用户登录记录-apiloginlog)
       - [获取登录失败记录 `/api/login/faillogin`](#获取登录失败记录-apiloginfaillogin)
@@ -64,11 +64,34 @@ API地址命名方式采用：`/api/项目名或代号/api路由`
 
 ### 项目API需求
 
-#### access-token `/login/accesstoken`
+#### access-token `/login/access`
 
 用于获取网站权限的凭证，有效期为60m，存放在`localStorage`。
 
-#### refresh-token `/login/refreshtoken`
+```js
+var xhr = new XMLHttpRequest();
+xhr.responseType = 'json';
+xhr.open('POST', testDic.urlhead + '/login/access');
+xhr.withCredentials = true;
+
+xhr.send();
+xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+        console.log(xhr.response.token);
+    }
+};
+
+// resdata
+{
+  code: 0,
+  msg: 'succeed',
+  data: {
+    token: '12333xxxxxxxxxxxxxx'
+  }
+}
+```
+
+#### refresh-token `/login/refresh`
 
 用于分发cookies。用于保证用户的登录状态，存放在`http-only Cookie`，有效期为7d。
 
@@ -76,7 +99,7 @@ API地址命名方式采用：`/api/项目名或代号/api路由`
 // post访问
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'json';
-xhr.open('POST', testDic.urlhead + '/login/exit');
+xhr.open('POST', testDic.urlhead + '/login/refresh');
 xhr.setRequestHeader('Content-Type', 'application/json');
 xhr.withCredentials = true;
 let v1 = {
@@ -133,8 +156,9 @@ const UserLoginLogModel = new mongoose.Schema({
     },
     platform: String,
     token: String,
+    cookies: String,
     ipaddress: String,
-    isDone: Number, // 0登录成功 1登录失败 2退出登录。。。
+    isDone: Number, // 0登录成功 1登录失败 2退出登录 3access失败
     isDelete: Number
 })
 ```
@@ -199,9 +223,10 @@ const LoginingModel = new mongoose.Schema({
 1. 解决引入redis的问题，全部变量挂载使用 -get
 2. jwt鉴权，全局中间件拦截实现 -get
 3. 退出登录记录 -get
-4. refresh记录
+4. refresh记录 -get
 5. 当前在线用户统计 -get
 6. redis中对数据做定时操作，去除无效token -get
 7. redis数据持久化 -get
-8. 本地日志记录
+8. 本地日志记录 -get
 9. 路由模块化设计 -get
+10. 部署生效 -get
