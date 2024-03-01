@@ -4,15 +4,11 @@
   - [项目背景及意义](#项目背景及意义)
   - [项目需求](#项目需求)
     - [项目标准化要求](#项目标准化要求)
-      - [API返回格式要求](#api返回格式要求)
-      - [API地址命名要求](#api地址命名要求)
-      - [API的安全访问](#api的安全访问)
     - [项目API需求](#项目api需求)
       - [access-token `/login/access`](#access-token-loginaccess)
       - [refresh-token `/login/refresh`](#refresh-token-loginrefresh)
       - [退出登录 `/login/exit`](#退出登录-loginexit)
-      - [获取所有用户登录记录 `/api/login/log`](#获取所有用户登录记录-apiloginlog)
-      - [获取登录失败记录 `/api/login/faillogin`](#获取登录失败记录-apiloginfaillogin)
+      - [后续API计划](#后续api计划)
     - [项目数据库需求](#项目数据库需求)
       - [用户基本信息表](#用户基本信息表)
       - [用户登录记录表](#用户登录记录表)
@@ -34,61 +30,47 @@ JWT项目作为econ-sta项目的后续，将作为网站的第一个项目进行
 
 ### 项目标准化要求
 
-#### API返回格式要求
+1. API返回格式要求：所有API返回格式均为json格式，状态码无论成功与失败都是200，系统自动处理部分与特殊情况除外。
 
-所有API返回格式均为json格式，状态码无论成功与失败都是200，系统自动处理部分与特殊情况除外。
+   ```json
+   // 成功实例
+   {
+      "code": 0, 
+      "msg": "succeed",
+      "data": "exit succeed!"
+   }
+   // 失败实例
+   {
+      "code": -1,
+      "msg": "token invalid!",
+      "data": null
+   }
+   ```
 
-```json
-// 成功实例
-{
-    "code": 0, 
-    "msg": "succeed",
-    "data": "exit succeed!"
-}
-
-// 失败实例
-{
-    "code": -1,
-    "msg": "token invalid!",
-    "data": null
-}
-```
-
-#### API地址命名要求
-
-API地址命名方式采用：`/api/项目名或代号/api路由`
-
-#### API的安全访问
-
-本项目所有API只能使用https访问，访问时，需要添加`xhr.withCredentials = true;`
+2. API地址命名要求：`/api/项目名或代号/api路由`
+3. API的安全访问
+   1. 本项目所有API只能使用https访问，访问时，需要添加`xhr.withCredentials = true;`
+   2. 身份认证在请求头中添加：`Token: 12333xxxxxxxxxxxxxx`
 
 ### 项目API需求
 
 #### access-token `/login/access`
 
-用于获取网站权限的凭证，有效期为60m，存放在`localStorage`。
+用于获取网站权限的凭证，必须携带有效的cookie,有效期为60m，存放在`localStorage`。
 
 ```js
-var xhr = new XMLHttpRequest();
-xhr.responseType = 'json';
-xhr.open('POST', testDic.urlhead + '/login/access');
-xhr.withCredentials = true;
-
-xhr.send();
-xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-        console.log(xhr.response.token);
+Headers: null,
+Mothed: POST,
+Query: null,
+Body: null,
+Respones:
+  {
+    code: 0,
+    msg: 'succeed',
+    data: {
+      token: '12333xxxxxxxxxxxxxx'
     }
-};
-
-// resdata
-{
-  code: 0,
-  msg: 'succeed',
-  data: {
-    token: '12333xxxxxxxxxxxxxx'
   }
-}
 ```
 
 #### refresh-token `/login/refresh`
@@ -96,36 +78,55 @@ xhr.onreadystatechange = function () {
 用于分发cookies。用于保证用户的登录状态，存放在`http-only Cookie`，有效期为7d。
 
 ```js
-// post访问
-var xhr = new XMLHttpRequest();
-xhr.responseType = 'json';
-xhr.open('POST', testDic.urlhead + '/login/refresh');
-xhr.setRequestHeader('Content-Type', 'application/json');
-xhr.withCredentials = true;
-let v1 = {
+Headers: null,
+Mothed: POST,
+Query: null,
+Body: {
   username: 'xxx',
   password: '123456'
-}
-xhr.send(JSON.stringify(v1));
+},
+Respones:
+  {
+    code: 0,
+    msg: 'succeed',
+    data: { 'ok' }
+  }
 ```
 
 #### 退出登录 `/login/exit`
 
+当前用户退出登录，其cookie将会失效，无法再使用该cookie获取accesstoken。
+
 ```js
-var xhr = new XMLHttpRequest();
-xhr.responseType = 'json';
-xhr.open('POST', testDic.urlhead + '/login/exit');
-xhr.withCredentials = true;
-xhr.send();
+Headers: null,
+Mothed: POST,
+Query: null,
+Body: null,
+Respones:
+  {
+    code: 0,
+    msg: 'succeed',
+    data: { 'ok' }
+  }
 ```
 
-#### 获取所有用户登录记录 `/api/login/log`
+#### 后续API计划
 
-#### 获取登录失败记录 `/api/login/faillogin`
+- 获取所有用户登录记录 `/api/login/log`
+- 获取登录失败记录 `/api/login/faillogin`
+- 获取当前登录有效的用户
+- 添加用户
+- 修改用户
+- 删除用户
+- 管理员用户验证
+- 强制下线用户
+- 创建管理页面
 
 ### 项目数据库需求
 
 #### 用户基本信息表
+
+包含用户的基本信息，用户判定登录是否成功，使用MongoDB。
 
 ```js
 const UserModel = new mongoose.Schema({
@@ -145,6 +146,8 @@ const UserModel = new mongoose.Schema({
 
 #### 用户登录记录表
 
+记录用户的登录行为，存储到MogonDB中，持久化保存。
+
 ```js
 const UserLoginLogModel = new mongoose.Schema({
     uid: Number,
@@ -158,15 +161,17 @@ const UserLoginLogModel = new mongoose.Schema({
     token: String,
     cookies: String,
     ipaddress: String,
-    isDone: Number, // 0登录成功 1登录失败 2退出登录 3access失败
+    isDone: Number, // 0登录成功 1登录失败 2退出登录 3access失败 4access成功
     isDelete: Number
 })
 ```
 
 #### 当前登录中的用户表
 
+记录当前有效的refresh-token，即当前在线用户记录，存储在Redis中。
+
 ```js
-// 仅记录refresh-token，准备存储到Redis中
+// 
 const LoginingModel = new mongoose.Schema({
     uid: Number,
     username: String,
@@ -185,8 +190,9 @@ const LoginingModel = new mongoose.Schema({
 
 #### 失效token记录表
 
+记录当前失效refresh-token，存储在Redis中，会定期清理失效token记录。
+
 ```js
-// 仅记录refresh-token，准备存储到Redis中
 const LoginingModel = new mongoose.Schema({
     uid: Number,
     username: String,
@@ -207,8 +213,18 @@ const LoginingModel = new mongoose.Schema({
 
 ### 项目使用框架及工具
 
-数据库：Mongoose
 框架：express
+
+数据库：
+
+- MongoDB
+
+使用到的包：
+
+- body-parser
+- jsonwebtoken
+- cookie-parser
+- mongoose
 
 ## 评审要点记录
 
