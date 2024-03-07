@@ -9,7 +9,7 @@ Restart=always
 RestartSec=5
 StartLimitInterval=60s
 WorkingDirectory=/home/admin/wang/localhub/jwt/
-ExecStart=/home/admin/wang/localhub/jwt/src/jwt-sta.js
+ExecStart=/home/admin/wang/localhub/jwt/dist/index.js
 ExecStop=/bin/kill -s QUIT $MAINPID
 ExecReload=/bin/kill -s HUP $MAINPID
 
