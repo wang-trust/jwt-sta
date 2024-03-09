@@ -2,3 +2,7 @@ node_modules
 log
 .vscode
 dist
+.gitattributes
+LICENSE
+package.json
+yarn.lock
