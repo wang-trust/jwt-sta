@@ -12,4 +12,4 @@ systemctl start jwt-sta.service
 echo 'jwt-sta.service status'
 systemctl status jwt-sta.service
 echo 'ps jwt-sta'
-ps -aux|grep jwt-sta
+ps -aux|grep jwt

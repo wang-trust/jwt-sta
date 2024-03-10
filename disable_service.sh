@@ -4,4 +4,4 @@ systemctl disable jwt-sta.service
 echo 'stop jwt-sta.service'
 systemctl stop jwt-sta.service
 echo 'ps jwt-sta'
-ps -aux|grep jwt-sta
+ps -aux|grep jwt
