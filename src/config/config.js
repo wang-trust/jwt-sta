@@ -4,7 +4,7 @@ import { ValidRecord } from "../redis/validRecord.js";
 const jwtInfo = {
     "secret": "goupi123456",
     "accesssecret": "goupig!!!!!",
-    "issuer": "https://wangtrust.top",
+    "issuer": "https://v6.wangtrust.top",
     // "audience": "wangtrust.top",
     "refreshtoken": 60 * 60 * 24,  // s，但cookies中的单位为 ms
     // "refreshtoken": 30,

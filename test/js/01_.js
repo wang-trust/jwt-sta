@@ -4,7 +4,7 @@ window.onload = function () {
 
 var testDic = {
     // urlhead: 'https://v4server.wangtrust.top:9611/api' + '/jwt';
-    urlhead: 'https://v6.wangtrust.top:9611/api' + '/jwt'
+    urlhead: 'https://wangtrust.top/api' + '/jwt'
 }
 
 function setonclick() {
